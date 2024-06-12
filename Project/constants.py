@@ -1,3 +1,7 @@
+import pygame
+
+pygame.font.init()
+
 TITLE = "Slash Mayhem"
 ICON = ""
 WIDTH = 1000
@@ -21,3 +25,8 @@ COLOURS = {
     "purple": (124, 82, 149),
     "gold": (255, 218, 0)
 }
+bigFont = pygame.font.Font("Assets\\Fonts\\dpcomic.ttf", 112)
+font = pygame.font.Font("Assets\\Fonts\\dpcomic.ttf", 64)
+medfont = pygame.font.Font("Assets\\Fonts\\dpcomic.ttf", 36)
+regFont = pygame.font.Font("Assets\\Fonts\\dpcomic.ttf", 24)
+smallFont = pygame.font.Font("Assets\\Fonts\\dpcomic.ttf", 18)
