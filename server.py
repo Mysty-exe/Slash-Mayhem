@@ -30,7 +30,7 @@ class Server:
                         
             playerInfo = json.loads(playerInfo.decode())
 
-            self.game[playerInfo["id"]] = {"ready": False, "name": playerInfo["name"], "colour": playerInfo["colour"], "coords": playerInfo["coords"]}
+            self.game[playerInfo["id"]] = {"ready": False, "name": playerInfo["name"], "colour": playerInfo["colour"], "coords": playerInfo["coords"], "direction": playerInfo["direction"], "state": playerInfo["state"], "frame": playerInfo["frame"]}
 
             thread = threading.Thread(target=self.handleClient, args=(socket, address, playerInfo["id"]))
             thread.start()
@@ -69,6 +69,9 @@ class Server:
                 for key, value in self.game.items():
                     if "ready" not in data.keys():
                         self.game[userId]["coords"] = data["coords"]
+                        self.game[userId]["direction"] = data["direction"]
+                        self.game[userId]["state"] = data["state"]
+                        self.game[userId]["frame"] = data["frame"]
                     dataToSend["players"][key] = value
                 conn.sendall(json.dumps(dataToSend).encode('utf-8'))
 

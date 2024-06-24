@@ -14,7 +14,7 @@ class Client:
         if not self.connected:
             self.client.connect((self.host, self.port))
             self.connected = True
-            data = json.dumps({"id": str(player.userId), "name": player.name, "colour": player.colour, "coords": [player.player_rect.x, player.player_rect.y]})
+            data = json.dumps({"id": str(player.userId), "name": player.name, "colour": player.colour, "coords": [player.player_rect.x, player.player_rect.y], "direction": player.direction, "state": player.state, "frame": player.frame})
             self.send(data)
 
     def disconnect(self):

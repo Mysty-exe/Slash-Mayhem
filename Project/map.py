@@ -4,9 +4,9 @@ class Map:
     def __init__(self, mapFile):
         self.mapFile = mapFile
         self.tiles = self.load_map()
-        self.middleTile = pygame.image.load("Assets\\Tiles\\platform1.png")
-        self.leftTile = pygame.image.load("Assets\\Tiles\\platform3.png")
-        self.rightTile = pygame.image.load("Assets\\Tiles\\platform2.png")
+        self.middleTile = pygame.image.load("Assets\\Tiles\\middleplatform.png")
+        self.leftTile = pygame.image.load("Assets\\Tiles\\leftplatform.png")
+        self.rightTile = pygame.image.load("Assets\\Tiles\\rightplatform.png")
         self.tileWidth = self.middleTile.get_width()
         self.tileHeight = self.middleTile.get_height()
 
@@ -20,7 +20,7 @@ class Map:
                 for tile in row:
                     if tile == "1" or tile == "2" or tile == "3":
                         tiles.append((tile, x, y))
-                    x += 32
+                    x += 16
                 y += 40
                 x = 0
             f.close()

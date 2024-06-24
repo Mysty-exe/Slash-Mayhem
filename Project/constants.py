@@ -1,8 +1,10 @@
 import pygame
+import os
+import Project.helpers as helpers
 
-pygame.font.init()
+pygame.init()
 
-TITLE = "Slash Mayhem"
+TITLE = "Under The Stars"
 ICON = ""
 WIDTH = 1000
 HEIGHT = 600
@@ -30,3 +32,4 @@ font = pygame.font.Font("Assets\\Fonts\\dpcomic.ttf", 64)
 medfont = pygame.font.Font("Assets\\Fonts\\dpcomic.ttf", 36)
 regFont = pygame.font.Font("Assets\\Fonts\\dpcomic.ttf", 24)
 smallFont = pygame.font.Font("Assets\\Fonts\\dpcomic.ttf", 18)
+

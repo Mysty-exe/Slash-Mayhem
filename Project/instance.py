@@ -8,7 +8,6 @@ import random
 import json
 
 class GameInstance():
-
     def __init__(self):
         self.width, self.height = constants.WIDTH, constants.HEIGHT
 
@@ -18,14 +17,14 @@ class GameInstance():
         self.displayCopy = self.display.copy()
         self.timer = 0
         self.screenshake = 0
-        
-        self.titleTxt = constants.bigFont.render(constants.TITLE, True, (208, 254, 254))
+
+        self.titleTxt = constants.bigFont.render(constants.TITLE, True, (107, 107, 107))
         self.singleTxt = constants.font.render("Singleplayer", True, (255, 255, 255))
         self.multiTxt = constants.font.render("Multiplayer", True, (255, 255, 255)) 
         self.quitTxt = constants.font.render("Quit", True, (255, 255, 255))
-        self.singleTxtHover = constants.font.render("Singleplayer", True, (208, 254, 254))
-        self.multiTxtHover = constants.font.render("Multiplayer", True, (208, 254, 254)) 
-        self.quitTxtHover = constants.font.render("Quit", True, (208, 254, 254))
+        self.singleTxtHover = constants.font.render("Singleplayer", True, (107, 107, 107))
+        self.multiTxtHover = constants.font.render("Multiplayer", True, (107, 107, 107)) 
+        self.quitTxtHover = constants.font.render("Quit", True, (107, 107, 107))
         self.singleTxtRect = self.singleTxt.get_rect()
         self.singleTxtRect.x, self.singleTxtRect.y = 100, 200
         self.multiTxtRect = self.multiTxt.get_rect()
@@ -34,14 +33,12 @@ class GameInstance():
         self.quitTxtRect.x, self.quitTxtRect.y = 100, 400
         self.continueTxt = constants.regFont.render("Press Enter to Continue", True, (255, 255, 255))
         
-        self.playerCardOptions = pygame.image.load("Assets\\card.png").convert_alpha()
-        self.playerCardOptions = pygame.transform.scale(self.playerCardOptions, (195, 350))
         self.trash = pygame.image.load("Assets\\trash.png").convert_alpha()
         self.trash = pygame.transform.scale(self.trash, (32, 32))
         self.trashHover = pygame.image.load("Assets\\trashHover.png").convert_alpha()
         self.trashHover = pygame.transform.scale(self.trashHover, (32, 32))
 
-        self.background = pygame.image.load("Assets\\background.jpg").convert_alpha()
+        self.background = pygame.image.load("Assets\\bg.jpg").convert_alpha()
         self.background = pygame.transform.scale(self.background, (self.width, self.height))
 
         self.transparentBg = pygame.Surface((self.width, self.height))
@@ -50,17 +47,16 @@ class GameInstance():
 
         self.map = Map("Project\\map.txt")
         self.players = []
+        self.projectiles = []
         self.newName = []
 
-        self.playerCard = pygame.image.load("Assets\\card.png").convert_alpha()
-        self.playerCard = pygame.transform.scale(self.playerCard, (150, 100))
-        self.gameUICoords = [[[500 - self.playerCard.get_width() / 2, 475]], [[250 - self.playerCard.get_width() / 2, 475], [750 - self.playerCard.get_width() / 2, 475]], [[167 - self.playerCard.get_width() / 2, 475], [500 - self.playerCard.get_width() / 2, 475], [833 - self.playerCard.get_width() / 2, 475]], [[125 - self.playerCard.get_width() / 2, 475], [375 - self.playerCard.get_width() / 2, 475], [625 - self.playerCard.get_width() / 2, 475], [875 - self.playerCard.get_width() / 2, 475]]]
+        self.gameUICoords = [[[500 - 150 / 2, 475]], [[250 - 150 / 2, 475], [750 - 150 / 2, 475]], [[167 - 150 / 2, 475], [500 - 150 / 2, 475], [833 - 150 / 2, 475]], [[125 - 150 / 2, 475], [375 - 150 / 2, 475], [625 - 150 / 2, 475], [875 - 150 / 2, 475]]]
 
     def main_menu(self, dt, state, events):
         self.display.fill(constants.COLOURS["black"])
         self.display.blit(self.background, (0, 0))
 
-        self.display.blit(self.titleTxt, (50, 30))
+        self.display.blit(self.titleTxt, (50, 50))
 
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
@@ -75,7 +71,7 @@ class GameInstance():
         if self.multiTxtRect.collidepoint(mouse):
             self.display.blit(self.multiTxtHover, self.multiTxtRect)
             if click:
-                self.players.append(Player("Anonymous", "Assets\\player.png", main=True, movements=[pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]))
+                self.players.append(Player("Anonymous", main=True, movements=[pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]))
                 state = "Multiple Options"
         else:
             self.display.blit(self.multiTxt, self.multiTxtRect)
@@ -88,11 +84,11 @@ class GameInstance():
             self.display.blit(self.quitTxt, self.quitTxtRect)
         
         self.screen.blit(self.display, (0, 0))
-
+    
         return state
     
     def single_options(self, dt, state, events):
-        self.display.fill((210, 180, 140))
+        self.display.fill((0, 0, 0))
         self.display.blit(self.singleTxt, (30, 20))
 
         mouse = pygame.mouse.get_pos()
@@ -113,12 +109,12 @@ class GameInstance():
         
         x = 100
         for n in range(4):
-            self.display.blit(self.playerCardOptions, (x, 150))
+            pygame.draw.rect(self.display, (255, 255, 255), (x, 150, 195, 350), border_radius=10)
             if len(self.players) - 1 >= n:
-                self.playerTxt = constants.regFont.render(self.players[n].name, True, (88, 57, 39))
+                self.playerTxt = constants.regFont.render(self.players[n].name, True, (0, 0, 0))
                 self.playerTxtRect = self.playerTxt.get_rect()
                 self.playerTxtRect.x, self.playerTxtRect.y = x + 20, 170
-                self.playerTxtHover = constants.regFont.render(self.players[n].name, True, (210, 180, 140))
+                self.playerTxtHover = constants.regFont.render(self.players[n].name, True, (107, 107, 107))
 
                 if self.playerTxtRect.collidepoint(mouse):
                     self.display.blit(self.playerTxtHover, self.playerTxtRect)
@@ -126,21 +122,25 @@ class GameInstance():
                         state = f"Change Name, Single, {self.players[n].userId}"
                 else:
                     self.display.blit(self.playerTxt, self.playerTxtRect)
-
+    
                 if len(self.players[n].movements) != 0:
-                    self.upTxt = constants.regFont.render(f"Up: {pygame.key.name(self.players[n].movements[0])}", True, (210, 180, 140))
-                    self.downTxt = constants.regFont.render(f"Down: {pygame.key.name(self.players[n].movements[2])}", True, (210, 180, 140))
-                    self.leftTxt = constants.regFont.render(f"Left: {pygame.key.name(self.players[n].movements[1])}", True, (210, 180, 140))
-                    self.rightTxt = constants.regFont.render(f"Right: {pygame.key.name(self.players[n].movements[3])}", True, (210, 180, 140))
+                    self.upTxt = constants.regFont.render(f"Up: {pygame.key.name(self.players[n].movements[0])}", True, (0, 0, 0))
+                    self.downTxt = constants.regFont.render(f"Down: {pygame.key.name(self.players[n].movements[2])}", True, (0, 0, 0))
+                    self.leftTxt = constants.regFont.render(f"Left: {pygame.key.name(self.players[n].movements[1])}", True, (0, 0, 0))
+                    self.rightTxt = constants.regFont.render(f"Right: {pygame.key.name(self.players[n].movements[3])}", True, (0, 0, 0))
+                    self.spearTxt = constants.regFont.render(f"Spear: {pygame.key.name(self.players[n].movements[4])}", True, (0, 0, 0))
+                    self.projectileTxt = constants.regFont.render(f"Projectile: {pygame.key.name(self.players[n].movements[5])}", True, (0, 0, 0))
                     self.display.blit(self.upTxt, (x + 30, 225))
-                    self.display.blit(self.downTxt, (x + 30, 275))
-                    self.display.blit(self.leftTxt, (x + 30, 325))
-                    self.display.blit(self.rightTxt, (x + 30, 375))
+                    self.display.blit(self.downTxt, (x + 30, 255))
+                    self.display.blit(self.leftTxt, (x + 30, 285))
+                    self.display.blit(self.rightTxt, (x + 30, 315))
+                    self.display.blit(self.spearTxt, (x + 30, 345))
+                    self.display.blit(self.projectileTxt, (x + 30, 375))
 
-                self.changeKeys = constants.regFont.render("Change Keys", True, (88, 57, 39))
+                self.changeKeys = constants.regFont.render("Change Keys", True, (0, 0, 0))
                 self.changeKeysRect = self.changeKeys.get_rect()
                 self.changeKeysRect.x, self.changeKeysRect.y = (x + 98) - self.changeKeys.get_width() / 2, (150 + 350) - self.changeKeys.get_height() - 20
-                self.changeKeysHover = constants.regFont.render("Change Keys", True, (210, 180, 140))
+                self.changeKeysHover = constants.regFont.render("Change Keys", True, (107, 107, 107))
 
                 if self.changeKeysRect.collidepoint(mouse):
                     self.display.blit(self.changeKeysHover, self.changeKeysRect)
@@ -160,16 +160,16 @@ class GameInstance():
     
             else:
                 if n == len(self.players):
-                    self.createNew = constants.regFont.render("Create Player", True, (88, 57, 39))
+                    self.createNew = constants.regFont.render("Create Player", True, (0, 0, 0))
                     self.createNewRect = self.createNew.get_rect()
                     self.createNewRect.x, self.createNewRect.y = (x + 98) - self.createNew.get_width() / 2, (150 + 175) - self.createNew.get_height() / 2
-                    self.createNewHover = constants.regFont.render("Create Player", True, (210, 180, 140))
+                    self.createNewHover = constants.regFont.render("Create Player", True, (107, 107, 107))
 
                     if self.createNewRect.collidepoint(mouse):
                         self.display.blit(self.createNewHover, self.createNewRect)
                         if click:
                             colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 0)
-                            self.players.append(Player(f"Player {n + 1}", "Assets\\player.png", main=True, colour=colour, movements=[]))
+                            self.players.append(Player(f"Player {n + 1}", main=True, colour=colour, movements=[]))
                     else:
                         self.display.blit(self.createNew, self.createNewRect)
 
@@ -182,19 +182,19 @@ class GameInstance():
         return state
 
     def multiple_options(self, dt, state, events):
-        self.display.fill((210, 180, 140))
+        self.display.fill((0, 0, 0))
         self.display.blit(self.multiTxt, (30, 20))
 
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
         
-        x = 500 - self.playerCardOptions.get_width() / 2
-        self.display.blit(self.playerCardOptions, (x, 150))
+        x = 500 - 150 / 2
+        pygame.draw.rect(self.display, (255, 255, 255), (x, 150, 195, 350), border_radius=10)
 
-        self.playerTxt = constants.regFont.render(self.players[0].name, True, (88, 57, 39))
+        self.playerTxt = constants.regFont.render(self.players[0].name, True, (0, 0, 0))
         self.playerTxtRect = self.playerTxt.get_rect()
         self.playerTxtRect.x, self.playerTxtRect.y = x + 20, 170
-        self.playerTxtHover = constants.regFont.render(self.players[0].name, True, (210, 180, 140))
+        self.playerTxtHover = constants.regFont.render(self.players[0].name, True, (107, 107, 107))
 
         if self.playerTxtRect.collidepoint(mouse):
             self.display.blit(self.playerTxtHover, self.playerTxtRect)
@@ -204,19 +204,23 @@ class GameInstance():
             self.display.blit(self.playerTxt, self.playerTxtRect)
 
         if len(self.players[0].movements) != 0:
-            self.upTxt = constants.regFont.render(f"Up: {pygame.key.name(self.players[0].movements[0])}", True, (210, 180, 140))
-            self.downTxt = constants.regFont.render(f"Down: {pygame.key.name(self.players[0].movements[2])}", True, (210, 180, 140))
-            self.leftTxt = constants.regFont.render(f"Left: {pygame.key.name(self.players[0].movements[1])}", True, (210, 180, 140))
-            self.rightTxt = constants.regFont.render(f"Right: {pygame.key.name(self.players[0].movements[3])}", True, (210, 180, 140))
+            self.upTxt = constants.regFont.render(f"Up: {pygame.key.name(self.players[0].movements[0])}", True, (0, 0, 0))
+            self.downTxt = constants.regFont.render(f"Down: {pygame.key.name(self.players[0].movements[2])}", True, (0, 0, 0))
+            self.leftTxt = constants.regFont.render(f"Left: {pygame.key.name(self.players[0].movements[1])}", True, (0, 0, 0))
+            self.rightTxt = constants.regFont.render(f"Right: {pygame.key.name(self.players[0].movements[3])}", True, (0, 0, 0))
+            self.spearTxt = constants.regFont.render(f"Spear: {pygame.key.name(self.players[0].movements[4])}", True, (0, 0, 0))
+            self.projectileTxt = constants.regFont.render(f"Projectile: {pygame.key.name(self.players[0].movements[5])}", True, (0, 0, 0))
             self.display.blit(self.upTxt, (x + 30, 225))
-            self.display.blit(self.downTxt, (x + 30, 275))
-            self.display.blit(self.leftTxt, (x + 30, 325))
-            self.display.blit(self.rightTxt, (x + 30, 375))
+            self.display.blit(self.downTxt, (x + 30, 255))
+            self.display.blit(self.leftTxt, (x + 30, 285))
+            self.display.blit(self.rightTxt, (x + 30, 315))
+            self.display.blit(self.spearTxt, (x + 30, 345))
+            self.display.blit(self.projectileTxt, (x + 30, 375))
 
-        self.changeKeys = constants.regFont.render("Change Keys", True, (88, 57, 39))
+        self.changeKeys = constants.regFont.render("Change Keys", True, (0, 0, 0))
         self.changeKeysRect = self.changeKeys.get_rect()
         self.changeKeysRect.x, self.changeKeysRect.y = (x + 98) - self.changeKeys.get_width() / 2, (150 + 350) - self.changeKeys.get_height() - 20
-        self.changeKeysHover = constants.regFont.render("Change Keys", True, (210, 180, 140))
+        self.changeKeysHover = constants.regFont.render("Change Keys", True, (107, 107, 107))
 
         if self.changeKeysRect.collidepoint(mouse):
             self.display.blit(self.changeKeysHover, self.changeKeysRect)
@@ -271,6 +275,7 @@ class GameInstance():
                             for player in self.players:
                                 if str(player.userId) == str(userId):
                                     player.name = "".join(self.newName)
+                                    player.nameTag = constants.smallFont.render(player.name, True, player.colour)
                                     self.newName = []
                                     if state.split(", ")[1] == "Single":
                                         state = "Single Options"
@@ -281,8 +286,8 @@ class GameInstance():
                     if len(pygame.key.name(event.key)) == 1 and len(self.newName) < 10:
                         self.newName.append(pygame.key.name(event.key))
 
-        directionsTxt = constants.medfont.render("Enter Your Preffered Username", True, (88, 57, 39))
-        nameTxt = constants.regFont.render(f"Username: {''.join(self.newName)}", True, (88, 57, 39))
+        directionsTxt = constants.medfont.render("Enter Your Preffered Username", True, (0, 0, 0))
+        nameTxt = constants.regFont.render(f"Username: {''.join(self.newName)}", True, (0, 0, 0))
         self.display.blit(directionsTxt, (500 - directionsTxt.get_width() / 2, 200))
         self.display.blit(nameTxt, (500 - nameTxt.get_width() / 2, 250))
 
@@ -303,7 +308,7 @@ class GameInstance():
                     for player in self.players:
                         if str(player.userId) == str(userId):
                             player.movements.append(event.key)
-                            if len(player.movements) == 4:
+                            if len(player.movements) == 6:
                                 if state.split(", ")[1] == "Single":
                                     state = "Single Options"
                                 elif state.split(", ")[1] == "Multiple":
@@ -318,8 +323,8 @@ class GameInstance():
                         self.players[0].movements = []
                         state = "Multiple Options"
 
-        keysTxt = constants.medfont.render("Enter Your Keys In The Order Of Up, Down, Left, Right...", True, (88, 57, 39))
-        noteTxt = constants.regFont.render("(Keys that are already registered won't work)", True, (88, 57, 39))
+        keysTxt = constants.medfont.render("Enter Your Keys In The Order Of Up, Down, Left, Right...", True, (0, 0, 0))
+        noteTxt = constants.regFont.render("(Keys that are already registered won't work)", True, (0, 0, 0))
         self.display.blit(self.displayCopy, (0, 0))
         self.display.blit(self.transparentBg, (0, 0))
 
@@ -358,16 +363,16 @@ class GameInstance():
             if data["started"]:
                 for key, value in data["players"].items():
                     if key != str(self.players[0].userId):
-                        player = Player(value["name"], "Assets\\player.png", colour=value["colour"])
+                        player = Player(value["name"], colour=value["colour"])
                         self.players.append(player)
                         player.userId = key
 
                 state = "Multiplayer Game"
 
         if state == "Lobby":
-            waitingTxt = constants.medfont.render(f"Waiting for Players...", True, (210, 180, 140))
-            playersTxt = constants.regFont.render(f'Players Ready: {data["connections"]}/{data["players"]}', True, (210, 180, 140))
-            enterTxt = constants.regFont.render(f"Press Enter if You're Ready", True, (210, 180, 140))
+            waitingTxt = constants.medfont.render(f"Waiting for Players...", True, (255, 255, 255))
+            playersTxt = constants.regFont.render(f'Players Ready: {data["connections"]}/{data["players"]}', True, (255, 255, 255))
+            enterTxt = constants.regFont.render(f"Press Enter if You're Ready", True, (255, 255, 255))
             
             self.display.blit(waitingTxt, (500 - waitingTxt.get_width() / 2, 300 - waitingTxt.get_height() / 2))
             self.display.blit(playersTxt, (500 - playersTxt.get_width() / 2, (300 + waitingTxt.get_height() / 2) + 20))
@@ -390,9 +395,17 @@ class GameInstance():
         keys = pygame.key.get_pressed()
         for player in self.players:
             player.draw(self.display)
-            player.checkInput(events, keys, self.map.tiles)
+            self.projectiles = player.checkInput(events, keys, self.map.tiles, self.projectiles)
             if player.fell():
                 self.screenshake = 45
+
+            self.projectiles = player.hit(self.projectiles)
+
+        for projectile in self.projectiles:
+            projectile[1].draw(self.display)
+            projectile[1].move()
+            if projectile[1].boundary():
+                self.projectiles.remove(projectile)
 
         for event in events:
             pass
@@ -411,22 +424,25 @@ class GameInstance():
         self.display.blit(self.background, (0, 0))
         self.gameUI()
 
-        self.client.send(json.dumps({"disconnect": False, "coords": [self.players[0].player_rect.x, self.players[0].player_rect.y]}))
+        self.client.send(json.dumps({"disconnect": False, "coords": [self.players[0].player_rect.x, self.players[0].player_rect.y], "direction": self.players[0].direction, "state": self.players[0].state, "frame": self.players[0].frame}))
         msg = self.client.receive()
         msg = json.loads(msg)
         for key, value in msg["players"].items():
             for player in self.players[1:]:
                 if key == str(player.userId):
+                    player.direction = value["direction"]
+                    player.state = value["state"]
+                    player.frame = value["frame"]
                     player.player_rect.x, player.player_rect.y = value["coords"][0], value["coords"][1]
 
         self.map.draw(self.display)
         keys = pygame.key.get_pressed()
         for player in reversed(self.players):
-            player.draw(self.display)
             if player.movements is not None:
-                player.checkInput(events, keys, self.map.tiles)
+                self.projectiles = player.checkInput(events, keys, self.map.tiles, self.projectiles)
                 if player.fell():
                     self.screenshake = 45
+            player.draw(self.display)
 
         for event in events:
             pass
@@ -441,7 +457,7 @@ class GameInstance():
             lives = constants.smallFont.render("Lives: " + str(player.lives), True, (0, 0, 0))
             health = constants.smallFont.render("Health: " + str(player.health), True, (0, 0, 0))
             x, y = self.gameUICoords[len(self.players) - 1][n]
-            self.display.blit(self.playerCard, (x, y))
+            pygame.draw.rect(self.display, (255, 255, 255), (x, y, 150, 100), border_radius=10)
             self.display.blit(name, (x + 10, y + 10))
             self.display.blit(lives, (x + 20, y + 10 + name.get_height() + 10))
             self.display.blit(health, (x + 20, y + 20 + name.get_height() + lives.get_height() + 10))
