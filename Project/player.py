@@ -40,7 +40,7 @@ class Player:
         self.location = Vector(self.player_rect.x, self.player_rect.y)
         self.animationTimer = 3
         self.frame = 0
-        self.projectileCooldown = 90
+        self.projectileCooldown = 30
 
         if self.main:
             self.xVel, self.yVel = 0, 0
@@ -194,9 +194,9 @@ class Player:
                             self.VertInput = True
                             self.inAir = True
                             self.landed = False
-                elif event.key == self.movements[5] and self.projectileCooldown <= 0:
+                elif event.key == self.movements[4] and self.projectileCooldown <= 0:
                     projectiles.append((self.userId, Projectile(self.direction, (self.player_rect.x + self.size / 2, self.player_rect.y + 10), self.colour)))
-                    self.projectileCooldown = 120
+                    self.projectileCooldown = 30
 
         self.move(tiles)
         return projectiles
@@ -218,7 +218,8 @@ class Player:
                 mask.fill()
                 offset = (projectile[1].projectile.x - self.player_rect.x, projectile[1].projectile.y - self.player_rect.y)
                 if self.mask.overlap(mask, offset):
-                    moveBy = 25
+                    self.health -= random.randint(50, 100)
+                    moveBy = 10
                     if projectile[1].direction == "left":
                         moveBy *= -1
                         
@@ -227,14 +228,15 @@ class Player:
 
         return projectiles
 
-    def fell(self):
-        if self.player_rect.y >= 800:
+    def dead(self):
+        if self.player_rect.y >= 800 or self.health <= 0:
             self.respawn()
             return True
         return False
 
     def respawn(self):
-        self.lives -= 1
+        if self.lives >= 1:
+            self.lives -= 1
         self.health = 1000
         self.player_rect.x = random.randint(200, 800)
         self.player_rect.y = -500

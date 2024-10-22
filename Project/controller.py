@@ -43,6 +43,8 @@ class GameController:
                 self.game_state = self.game.run(self.dt, self.game_state, events)
             elif self.game_state == 'Multiplayer Game':
                 self.game_state = self.game.multiplayerRun(self.dt, self.game_state, events)
+            elif self.game_state == 'End':
+                self.game_state = self.game.end(self.dt, self.game_state, events)
 
             pygame.display.update()
             self.dt = (self.clock.tick(self.fps) / 1000) * 60

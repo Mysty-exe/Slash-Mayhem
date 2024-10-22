@@ -32,6 +32,7 @@ class GameInstance():
         self.quitTxtRect = self.quitTxt.get_rect()
         self.quitTxtRect.x, self.quitTxtRect.y = 100, 400
         self.continueTxt = constants.regFont.render("Press Enter to Continue", True, (255, 255, 255))
+        self.mainMenuTxt = constants.regFont.render("Press Enter to Go to Main Menu", True, (107, 107, 107)) 
         
         self.trash = pygame.image.load("Assets\\trash.png").convert_alpha()
         self.trash = pygame.transform.scale(self.trash, (32, 32))
@@ -71,7 +72,7 @@ class GameInstance():
         if self.multiTxtRect.collidepoint(mouse):
             self.display.blit(self.multiTxtHover, self.multiTxtRect)
             if click:
-                self.players.append(Player("Anonymous", main=True, movements=[pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]))
+                self.players.append(Player("Anonymous", main=True, movements=[pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_m]))
                 state = "Multiple Options"
         else:
             self.display.blit(self.multiTxt, self.multiTxtRect)
@@ -128,14 +129,12 @@ class GameInstance():
                     self.downTxt = constants.regFont.render(f"Down: {pygame.key.name(self.players[n].movements[2])}", True, (0, 0, 0))
                     self.leftTxt = constants.regFont.render(f"Left: {pygame.key.name(self.players[n].movements[1])}", True, (0, 0, 0))
                     self.rightTxt = constants.regFont.render(f"Right: {pygame.key.name(self.players[n].movements[3])}", True, (0, 0, 0))
-                    self.spearTxt = constants.regFont.render(f"Spear: {pygame.key.name(self.players[n].movements[4])}", True, (0, 0, 0))
-                    self.projectileTxt = constants.regFont.render(f"Projectile: {pygame.key.name(self.players[n].movements[5])}", True, (0, 0, 0))
+                    self.projectileTxt = constants.regFont.render(f"Projectile: {pygame.key.name(self.players[n].movements[4])}", True, (0, 0, 0))
                     self.display.blit(self.upTxt, (x + 30, 225))
                     self.display.blit(self.downTxt, (x + 30, 255))
                     self.display.blit(self.leftTxt, (x + 30, 285))
                     self.display.blit(self.rightTxt, (x + 30, 315))
-                    self.display.blit(self.spearTxt, (x + 30, 345))
-                    self.display.blit(self.projectileTxt, (x + 30, 375))
+                    self.display.blit(self.projectileTxt, (x + 30, 345))
 
                 self.changeKeys = constants.regFont.render("Change Keys", True, (0, 0, 0))
                 self.changeKeysRect = self.changeKeys.get_rect()
@@ -208,14 +207,12 @@ class GameInstance():
             self.downTxt = constants.regFont.render(f"Down: {pygame.key.name(self.players[0].movements[2])}", True, (0, 0, 0))
             self.leftTxt = constants.regFont.render(f"Left: {pygame.key.name(self.players[0].movements[1])}", True, (0, 0, 0))
             self.rightTxt = constants.regFont.render(f"Right: {pygame.key.name(self.players[0].movements[3])}", True, (0, 0, 0))
-            self.spearTxt = constants.regFont.render(f"Spear: {pygame.key.name(self.players[0].movements[4])}", True, (0, 0, 0))
-            self.projectileTxt = constants.regFont.render(f"Projectile: {pygame.key.name(self.players[0].movements[5])}", True, (0, 0, 0))
+            self.projectileTxt = constants.regFont.render(f"Projectile: {pygame.key.name(self.players[0].movements[4])}", True, (0, 0, 0))
             self.display.blit(self.upTxt, (x + 30, 225))
             self.display.blit(self.downTxt, (x + 30, 255))
             self.display.blit(self.leftTxt, (x + 30, 285))
             self.display.blit(self.rightTxt, (x + 30, 315))
-            self.display.blit(self.spearTxt, (x + 30, 345))
-            self.display.blit(self.projectileTxt, (x + 30, 375))
+            self.display.blit(self.projectileTxt, (x + 30, 345))
 
         self.changeKeys = constants.regFont.render("Change Keys", True, (0, 0, 0))
         self.changeKeysRect = self.changeKeys.get_rect()
@@ -308,7 +305,7 @@ class GameInstance():
                     for player in self.players:
                         if str(player.userId) == str(userId):
                             player.movements.append(event.key)
-                            if len(player.movements) == 6:
+                            if len(player.movements) == 5:
                                 if state.split(", ")[1] == "Single":
                                     state = "Single Options"
                                 elif state.split(", ")[1] == "Multiple":
@@ -393,13 +390,6 @@ class GameInstance():
 
         self.map.draw(self.display)
         keys = pygame.key.get_pressed()
-        for player in self.players:
-            player.draw(self.display)
-            self.projectiles = player.checkInput(events, keys, self.map.tiles, self.projectiles)
-            if player.fell():
-                self.screenshake = 45
-
-            self.projectiles = player.hit(self.projectiles)
 
         for projectile in self.projectiles:
             projectile[1].draw(self.display)
@@ -407,8 +397,21 @@ class GameInstance():
             if projectile[1].boundary():
                 self.projectiles.remove(projectile)
 
-        for event in events:
-            pass
+        for player in self.players:
+            player.draw(self.display)
+            self.projectiles = player.checkInput(events, keys, self.map.tiles, self.projectiles)
+            if player.dead():
+                self.screenshake = 45
+
+            self.projectiles = player.hit(self.projectiles)
+
+        count = 0
+        for p in self.players:
+            if p.lives > 0:
+                count += 1
+
+        if count == 1:
+            state = "End"
 
         self.screen.blit(self.display, renderOffset)
         
@@ -424,28 +427,33 @@ class GameInstance():
         self.display.blit(self.background, (0, 0))
         self.gameUI()
 
-        self.client.send(json.dumps({"disconnect": False, "coords": [self.players[0].player_rect.x, self.players[0].player_rect.y], "direction": self.players[0].direction, "state": self.players[0].state, "frame": self.players[0].frame}))
+        self.client.send(json.dumps({"disconnect": False, "coords": [self.players[0].player_rect.x, self.players[0].player_rect.y], "direction": self.players[0].direction, "lives": self.players[0].lives, "health": self.players[0].health, "state": self.players[0].state, "frame": self.players[0].frame}))
         msg = self.client.receive()
         msg = json.loads(msg)
         for key, value in msg["players"].items():
             for player in self.players[1:]:
                 if key == str(player.userId):
                     player.direction = value["direction"]
+                    player.lives = value["lives"]
+                    player.health = value["health"]
                     player.state = value["state"]
                     player.frame = value["frame"]
                     player.player_rect.x, player.player_rect.y = value["coords"][0], value["coords"][1]
+
+        for projectile in self.projectiles:
+            projectile[1].draw(self.display)
+            projectile[1].move()
+            if projectile[1].boundary():
+                self.projectiles.remove(projectile)
 
         self.map.draw(self.display)
         keys = pygame.key.get_pressed()
         for player in reversed(self.players):
             if player.movements is not None:
                 self.projectiles = player.checkInput(events, keys, self.map.tiles, self.projectiles)
-                if player.fell():
+                if player.dead():
                     self.screenshake = 45
             player.draw(self.display)
-
-        for event in events:
-            pass
 
         self.screen.blit(self.display, renderOffset)
 
@@ -461,3 +469,24 @@ class GameInstance():
             self.display.blit(name, (x + 10, y + 10))
             self.display.blit(lives, (x + 20, y + 10 + name.get_height() + 10))
             self.display.blit(health, (x + 20, y + 20 + name.get_height() + lives.get_height() + 10))
+
+    def end(self, dt, state, events):
+        self.display.fill(constants.COLOURS["black"])
+        self.display.blit(self.background, (0, 0))
+        name = ""
+        for player in self.players:
+            if player.lives > 0:
+                name = player.name
+
+        self.endTxt = constants.bigFont.render(f"{name} has won!", True, (107, 107, 107))
+
+        self.display.blit(self.endTxt, (self.width / 2 - self.endTxt.get_width() / 2, 250))
+        self.display.blit(self.mainMenuTxt, (self.width / 2 - self.mainMenuTxt.get_width() / 2, 400))
+
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    state = "Main Menu"
+
+        self.screen.blit(self.display, (0, 0))
+        return state
